@@ -11,10 +11,11 @@ app.use(express.json());
 
 // Import Routes
 const ordersRoutes = require("./routes/orders");
-
+const shipmentRoutes = require("./routes/shipment");
 
 // Use Routes
 app.use("/api/orders", ordersRoutes);
+app.use("/api/shipment", shipmentRoutes);
 
 
 // Start Server
