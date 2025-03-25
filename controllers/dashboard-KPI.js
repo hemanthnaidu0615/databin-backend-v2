@@ -48,3 +48,32 @@ exports.getShipmentStatusPercentage = async (req, res) => {
         res.status(500).json({ error: "Failed to fetch shipment percentages" });
     }
 };
+
+exports.getFulfillmentRate = async (req, res) => {
+    try {
+        const query = `
+            SELECT 
+           (COUNT(e.order_id) * 100.0 / NULLIF(COUNT(o.order_id), 0)) AS fulfillment_rate
+           FROM orders o
+           LEFT JOIN fulfillment_event e 
+           ON o.order_id = e.order_id
+           AND e.event_type IN ('Shipped', 'Same-Day Delivery', 'Ship to Home', 
+                     'Store Pickup', 'Curbside Pickup', 'Locker Pickup');`
+
+        // Explicitly enable Multi-Stage Query Engine
+        const data = await queryPinot(query, { queryOptions: "useMultistageEngine=true" });
+
+        if (!data?.resultTable?.rows?.length || data.resultTable.rows[0][0] === null) {
+            return res.json({ message: "No fulfillment data available." });
+        }
+
+        const [fulfillmentRate] = data.resultTable.rows[0];
+
+        res.json({
+            fulfillment_rate: `${fulfillmentRate.toFixed(2)}%`
+        });
+
+    } catch (error) {
+        res.status(500).json({ error: "Failed to fetch fulfillment rate" });
+    }
+};
