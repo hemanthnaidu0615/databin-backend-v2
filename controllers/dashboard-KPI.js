@@ -33,21 +33,21 @@ exports.getShipmentStatusPercentage = async (req, res) => {
         const data = await queryPinot(query);
 
         if (!data?.resultTable?.rows?.length) {
-            return res.json({ delayed_percentage: 0, in_transit_percentage: 0 });
+            return res.json({ delayed_percentage: 0, in_transit_orders: 0 });
         }
 
         const [totalOrders, delayedOrders, inTransitOrders] = data.resultTable.rows[0];
 
-        // Calculate percentages
+        // Calculate delayed percentage only
         const delayedPercentage = totalOrders ? ((delayedOrders / totalOrders) * 100).toFixed(2) : "0.00";
-        const inTransitPercentage = totalOrders ? ((inTransitOrders / totalOrders) * 100).toFixed(2) : "0.00";
 
-        res.json({ delayed_percentage: delayedPercentage, in_transit_percentage: inTransitPercentage });
+        res.json({ delayed_percentage: delayedPercentage, in_transit_orders: inTransitOrders });
     } catch (error) {
-        console.error("Error fetching shipment percentages:", error);
-        res.status(500).json({ error: "Failed to fetch shipment percentages" });
+        console.error("Error fetching shipment data:", error);
+        res.status(500).json({ error: "Failed to fetch shipment data" });
     }
 };
+
 
 exports.getFulfillmentRate = async (req, res) => {
     try {
@@ -75,5 +75,29 @@ exports.getFulfillmentRate = async (req, res) => {
 
     } catch (error) {
         res.status(500).json({ error: "Failed to fetch fulfillment rate" });
+    }
+};
+
+exports.getOutOfStockCount = async (req, res) => {
+    try {
+        // Optimized query to count distinct out-of-stock products
+        const query = `
+            SELECT COUNT(DISTINCT product_id) AS out_of_stock_count
+            FROM inventory
+            WHERE status = 'Out of Stock'
+        `;
+
+        const data = await queryPinot(query);
+
+        if (!data?.resultTable?.rows?.length) {
+            return res.json({ out_of_stock_count: 0 });
+        }
+
+        const [outOfStockCount] = data.resultTable.rows[0];
+
+        res.json({ out_of_stock_count: outOfStockCount });
+    } catch (error) {
+        console.error("Error fetching out-of-stock count:", error);
+        res.status(500).json({ error: "Failed to fetch out-of-stock count" });
     }
 };
