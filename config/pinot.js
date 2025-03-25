@@ -16,7 +16,9 @@ const queryPinot = async (sql) => {
     try {
         const response = await axios.post(
             `${pinotConfig.brokerUrl}/query/sql`,
-            { sql },
+            { sql,
+                queryOptions: "useMultistageEngine=true"
+             },
             { headers: pinotConfig.headers }
         );
         return response.data;
