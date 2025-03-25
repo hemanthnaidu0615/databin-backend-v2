@@ -10,12 +10,12 @@ app.use(cors());
 app.use(express.json());
 
 // Import Routes
-const ordersRoutes = require("./routes/orders");
-const shipmentRoutes = require("./routes/shipment");
+const ordersRoutes = require("./routes/tables");
+const dashboardKPI = require("./routes/dashboard-KPI");
 
 // Use Routes
 app.use("/api/orders", ordersRoutes);
-app.use("/api/shipment", shipmentRoutes);
+app.use("/api/dashboard-kpi", dashboardKPI);
 
 
 // Start Server

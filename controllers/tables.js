@@ -1,21 +1,6 @@
-const express = require("express");
 const { queryPinot } = require("../config/pinot");
 
-const router = express.Router();
-
-// 📌 API: Get Total Orders Count
-router.get("/total-orders", async (req, res) => {
-    try {
-        const data = await queryPinot("SELECT COUNT(*) AS total_orders FROM orders");
-        const totalOrders = data.resultTable.rows[0][0];
-        res.json({ total_orders: totalOrders });
-    } catch (error) {
-        res.status(500).json({ error: "Failed to fetch total orders" });
-    }
-});
-
-// 📌 API: Get 5 Recent Orders with Product, Category & Shipment Data
-router.get("/recent-orders", async (req, res) => {
+exports.getRecentOrders = async (req, res) => {
     try {
         // Step 1: Fetch the latest 5 orders
         const ordersQuery = `
@@ -86,6 +71,4 @@ router.get("/recent-orders", async (req, res) => {
         console.error("Error fetching recent orders:", error);
         res.status(500).json({ error: "Failed to fetch recent orders" });
     }
-});
-
-module.exports = router;
+};
