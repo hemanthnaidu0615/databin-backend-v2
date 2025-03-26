@@ -1,5 +1,5 @@
 const express = require("express");
-const { getTotalOrders, getShipmentStatusPercentage, getFulfillmentRate } = require("../Controllers/dashboard-KPI");
+const { getTotalOrders, getShipmentStatusPercentage, getFulfillmentRate, getOutOfStockCount  } = require("../Controllers/dashboard-KPI");
 
 const router = express.Router();
 
@@ -10,5 +10,7 @@ router.get("/total-orders", getTotalOrders);
 router.get("/shipment-status-percentage", getShipmentStatusPercentage);
 
 router.get("/fulfillment-rate", getFulfillmentRate);
+
+router.get("/out-of-stock", getOutOfStockCount);
 
 module.exports = router;
